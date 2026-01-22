@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1e3c72">
+  <meta name="description" content="SpreadCraft Tech Solutions - Advanced Microsoft Excel with Applications to Data Analytics Course Enrollment">
+  
+  <title>SpreadCraft Tech Solutions - Enrollment</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- iOS Support -->
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SpreadCraft">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    .header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    /* Install prompt banner */
+    .install-banner {
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    
+    .install-banner button {
+      background: white;
+      color: #4CAF50;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    
+    .install-banner .close-btn {
+      background: transparent;
+      color: white;
+      padding: 5px 10px;
+    }
+    
+    .form-content {
+      padding: 40px;
+    }
+    
+    .section {
+      margin-bottom: 35px;
+    }
+    
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1e3c72;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #667eea;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .required {
+      color: #e74c3c;
+    }
+    
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+    
+    .checkbox-group,
+    .radio-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .checkbox-item,
+    .radio-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    input[type="checkbox"],
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .rating-group {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+    
+    .rating-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .submit-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .submit-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .message {
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .conditional-section {
+      margin-left: 20px;
+      padding-left: 20px;
+      border-left: 3px solid #667eea;
+    }
+    
+    .offline-indicator {
+      background: #ff9800;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- Install Prompt Banner -->
+  <div class="install-banner" id="installBanner">
+    <span>📱 Install this app for quick access!</span>
+    <div>
+      <button id="installBtn">Install</button>
+      <button class="close-btn" id="closeBanner">✕</button>
+    </div>
+  </div>
+  
+  <!-- Offline Indicator -->
+  <div class="offline-indicator" id="offlineIndicator">
+    ⚠️ You are offline. Form submission will be available when you're back online.
+  </div>
+  
+  <div class="container">
+    <div class="header">
+      <h1>🎓 SpreadCraft Tech Solutions</h1>
+      <p>Advanced Microsoft Excel with Applications to Data Analytics</p>
+      <p style="font-size: 14px; margin-top: 10px;">Course Enrollment Form</p>
+    </div>
+    
+    <div class="form-content">
+      <div id="message" class="message"></div>
+      
+      <form id="enrollmentForm">
+        
+        <!-- Section 1: Personal & Basic Information -->
+        <div class="section">
+          <h2 class="section-title">1. Personal & Basic Information</h2>
+          
+          <div class="form-group">
+            <label>Full Name <span class="required">*</span></label>
+            <input type="text" name="fullName" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Phone Number <span class="required">*</span></label>
+            <input type="tel" name="phoneNumber" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Email Address <span class="required">*</span></label>
+            <input type="email" name="email" required>
+          </div>
+          
+          <div class="form-group">
+            <label>Home Address</label>
+            <textarea name="homeAddress"></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label>Highest Level of Education <span class="required">*</span></label>
+            <select name="education" required>
+              <option value="">-- Select --</option>
+              <option value="High School">High School</option>
+              <option value="Diploma">Diploma</option>
+              <option value="Bachelor's Degree">Bachelor's Degree</option>
+              <option value="Master's Degree">Master's Degree</option>
+              <option value="PhD">PhD</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        
+        <!-- Section 2: Computer & Software Readiness -->
+        <div class="section">
+          <h2 class="section-title">2. Computer & Software Readiness</h2>
+          
+          <div class="form-group">
+            <label>Do you own a laptop? <span class="required">*</span></label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="ownLaptop" value="Yes" required>
+                <span>Yes</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="ownLaptop" value="No">
+                <span>No</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Which operating system do you use?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="os" value="Windows">
+                <span>Windows</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="os" value="Mac">
+                <span>Mac</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Which version of Microsoft Excel do you currently use?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="excelVersion" value="Excel 2016">
+                <span>Excel 2016</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelVersion" value="Excel 2019">
+                <span>Excel 2019</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelVersion" value="Excel 2021">
+                <span>Excel 2021</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelVersion" value="Microsoft 365">
+                <span>Microsoft 365</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelVersion" value="Not sure">
+                <span>Not sure</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>How comfortable are you with basic computer operations?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="computerComfort" value="Beginner">
+                <span>Beginner</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="computerComfort" value="Intermediate">
+                <span>Intermediate</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="computerComfort" value="Advanced">
+                <span>Advanced</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section 3: Excel Experience Level -->
+        <div class="section">
+          <h2 class="section-title">3. Excel Experience Level</h2>
+          
+          <div class="form-group">
+            <label>How long have you used Excel?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="excelDuration" value="Never">
+                <span>Never</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelDuration" value="Less than 6 months">
+                <span>Less than 6 months</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelDuration" value="6 months - 2 years">
+                <span>6 months - 2 years</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelDuration" value="Over 2 years">
+                <span>Over 2 years</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Which of the following have you used? (Select all that apply)</label>
+            <div class="checkbox-group">
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Basic formulas (SUM, AVERAGE, COUNT)">
+                <span>Basic formulas (SUM, AVERAGE, COUNT)</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Logical functions (IF, AND, OR)">
+                <span>Logical functions (IF, AND, OR)</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Lookup functions (VLOOKUP, XLOOKUP, INDEX/MATCH)">
+                <span>Lookup functions (VLOOKUP, XLOOKUP, INDEX/MATCH)</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Date & text functions">
+                <span>Date & text functions</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Pivot Tables">
+                <span>Pivot Tables</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Charts & dashboards">
+                <span>Charts & dashboards</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Data validation & drop-downs">
+                <span>Data validation & drop-downs</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Conditional formatting">
+                <span>Conditional formatting</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Power Query">
+                <span>Power Query</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Power Pivot / DAX">
+                <span>Power Pivot / DAX</span>
+              </div>
+              <div class="checkbox-item">
+                <input type="checkbox" name="excelFeatures" value="Macros / VBA">
+                <span>Macros / VBA</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section 4: Data Analytics Exposure -->
+        <div class="section">
+          <h2 class="section-title">4. Data Analytics Exposure</h2>
+          
+          <div class="form-group">
+            <label>Have you worked with data before?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="workedWithData" value="Yes" id="dataYes">
+                <span>Yes</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="workedWithData" value="No" id="dataNo">
+                <span>No</span>
+              </div>
+            </div>
+          </div>
+          
+          <div id="dataTypeSection" class="conditional-section" style="display: none;">
+            <div class="form-group">
+              <label>What type of data? (Select all that apply)</label>
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <input type="checkbox" name="dataType" value="Sales data">
+                  <span>Sales data</span>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" name="dataType" value="Finance / Accounting">
+                  <span>Finance / Accounting</span>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" name="dataType" value="HR / Attendance">
+                  <span>HR / Attendance</span>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" name="dataType" value="Academic / Research">
+                  <span>Academic / Research</span>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" name="dataType" value="Operations / Logistics">
+                  <span>Operations / Logistics</span>
+                </div>
+                <div class="checkbox-item">
+                  <input type="checkbox" name="dataType" value="Other">
+                  <span>Other</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>What is the largest dataset you have worked with?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="datasetSize" value="Under 1,000 rows">
+                <span>Under 1,000 rows</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="datasetSize" value="1,000 - 10,000 rows">
+                <span>1,000 - 10,000 rows</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="datasetSize" value="Over 10,000 rows">
+                <span>Over 10,000 rows</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section 5: Learning Goals & Expectations -->
+        <div class="section">
+          <h2 class="section-title">5. Learning Goals & Expectations</h2>
+          
+          <div class="form-group">
+            <label>Why do you want to take this Advanced Excel for Data Analytics course?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="motivation" value="Career advancement">
+                <span>Career advancement</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="motivation" value="Job requirement">
+                <span>Job requirement</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="motivation" value="Career change into data/analytics">
+                <span>Career change into data/analytics</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="motivation" value="Academic/research work">
+                <span>Academic/research work</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="motivation" value="Business use">
+                <span>Business use</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="motivation" value="Personal skill development">
+                <span>Personal skill development</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>What do you want to be able to do after the course?</label>
+            <textarea name="postCourseGoals" placeholder="Example: build dashboards, analyze sales trends, automate reports, clean data, etc."></textarea>
+          </div>
+        </div>
+        
+        <!-- Section 6: Industry & Use Case -->
+        <div class="section">
+          <h2 class="section-title">6. Industry & Use Case</h2>
+          
+          <div class="form-group">
+            <label>Which industry are you in or interested in?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Finance">
+                <span>Finance</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Procurement & Supply Chain">
+                <span>Procurement & Supply Chain</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Education">
+                <span>Education</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Manufacturing">
+                <span>Manufacturing</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Retail">
+                <span>Retail</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Health">
+                <span>Health</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="IT / Tech">
+                <span>IT / Tech</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Student / Job Seeker">
+                <span>Student / Job Seeker</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="industry" value="Other">
+                <span>Other</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Will you be using Excel mainly for:</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="excelUse" value="Reporting">
+                <span>Reporting</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelUse" value="Data analysis">
+                <span>Data analysis</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelUse" value="Decision-making dashboards">
+                <span>Decision-making dashboards</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelUse" value="Automation">
+                <span>Automation</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="excelUse" value="Academic research">
+                <span>Academic research</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section 7: Availability & Learning Commitment -->
+        <div class="section">
+          <h2 class="section-title">7. Availability & Learning Commitment</h2>
+          
+          <div class="form-group">
+            <label>Preferred learning mode:</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="learningMode" value="Physical">
+                <span>Physical</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="learningMode" value="Online live">
+                <span>Online live</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="learningMode" value="Hybrid">
+                <span>Hybrid</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Preferred class time:</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="classTime" value="Weekdays">
+                <span>Weekdays</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="classTime" value="Weekends">
+                <span>Weekends</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="classTime" value="Evening">
+                <span>Evening</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>How many hours per week can you dedicate to practice?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="practiceHours" value="Less than 2">
+                <span>Less than 2</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="practiceHours" value="2-4">
+                <span>2-4</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="practiceHours" value="5+">
+                <span>5+</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section 8: Self-Assessment -->
+        <div class="section">
+          <h2 class="section-title">8. Self-Assessment</h2>
+          
+          <div class="form-group">
+            <label>Rate your confidence in Excel (1 = Very Low, 5 = Very High)</label>
+            <div class="rating-group">
+              <div class="rating-item">
+                <input type="radio" name="excelConfidence" value="1">
+                <span>1</span>
+              </div>
+              <div class="rating-item">
+                <input type="radio" name="excelConfidence" value="2">
+                <span>2</span>
+              </div>
+              <div class="rating-item">
+                <input type="radio" name="excelConfidence" value="3">
+                <span>3</span>
+              </div>
+              <div class="rating-item">
+                <input type="radio" name="excelConfidence" value="4">
+                <span>4</span>
+              </div>
+              <div class="rating-item">
+                <input type="radio" name="excelConfidence" value="5">
+                <span>5</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>What do you find most challenging in Excel?</label>
+            <textarea name="excelChallenge" placeholder="Share your biggest Excel challenges..."></textarea>
+          </div>
+        </div>
+        
+        <!-- Section 9: Prerequisite Check -->
+        <div class="section">
+          <h2 class="section-title">9. Prerequisite Check</h2>
+          
+          <div class="form-group">
+            <label>Can you confidently use IF statements?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="canUseIF" value="Yes">
+                <span>Yes</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="canUseIF" value="No">
+                <span>No</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Can you confidently use Pivot Tables?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="canUsePivot" value="Yes">
+                <span>Yes</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="canUsePivot" value="No">
+                <span>No</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Can you confidently use Lookup formulas?</label>
+            <div class="radio-group">
+              <div class="radio-item">
+                <input type="radio" name="canUseLookup" value="Yes">
+                <span>Yes</span>
+              </div>
+              <div class="radio-item">
+                <input type="radio" name="canUseLookup" value="No">
+                <span>No</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section 10: Final Section -->
+        <div class="section">
+          <h2 class="section-title">10. Final Section</h2>
+          
+          <div class="form-group">
+            <label>How did you hear about this course?</label>
+            <input type="text" name="howHeard" placeholder="E.g., Social media, friend, website, etc.">
+          </div>
+          
+          <div class="form-group">
+            <label>Any specific expectations or questions about the course?</label>
+            <textarea name="expectations" placeholder="Share any questions or expectations you have..."></textarea>
+          </div>
+        </div>
+        
+        <button type="submit" class="submit-btn" id="submitBtn">Submit Enrollment</button>
+      </form>
+    </div>
+  </div>
+  
+  <script src="app.js"></script>
+</body>
+</html>
