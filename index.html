@@ -3,20 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1e3c72">
-  <meta name="description" content="SpreadCraft Tech Solutions - Advanced Microsoft Excel with Applications to Data Analytics Course Enrollment">
-  
-  <title>SpreadCraft Tech Solutions - Enrollment</title>
-  
-  <!-- PWA Manifest -->
+  <meta name="description" content="SpreadCraft Tech Solutions - Advanced Excel for Data Analytics Course Enrollment">
+  <meta name="theme-color" content="#667eea">
   <link rel="manifest" href="manifest.json">
-  
-  <!-- iOS Support -->
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SpreadCraft">
-  
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>SpreadCraft Tech Solutions - Enrollment</title>
   <style>
     * {
       margin: 0;
@@ -55,34 +47,6 @@
     .header p {
       font-size: 16px;
       opacity: 0.9;
-    }
-    
-    /* Install prompt banner */
-    .install-banner {
-      background: #4CAF50;
-      color: white;
-      padding: 15px;
-      text-align: center;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    
-    .install-banner button {
-      background: white;
-      color: #4CAF50;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-    }
-    
-    .install-banner .close-btn {
-      background: transparent;
-      color: white;
-      padding: 5px 10px;
     }
     
     .form-content {
@@ -224,30 +188,30 @@
       border-left: 3px solid #667eea;
     }
     
-    .offline-indicator {
-      background: #ff9800;
-      color: white;
-      padding: 10px;
-      text-align: center;
+    .install-prompt {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      color: #856404;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
       display: none;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .install-btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
     }
   </style>
 </head>
 <body>
-  <!-- Install Prompt Banner -->
-  <div class="install-banner" id="installBanner">
-    <span>📱 Install this app for quick access!</span>
-    <div>
-      <button id="installBtn">Install</button>
-      <button class="close-btn" id="closeBanner">✕</button>
-    </div>
-  </div>
-  
-  <!-- Offline Indicator -->
-  <div class="offline-indicator" id="offlineIndicator">
-    ⚠️ You are offline. Form submission will be available when you're back online.
-  </div>
-  
   <div class="container">
     <div class="header">
       <h1>🎓 SpreadCraft Tech Solutions</h1>
@@ -256,6 +220,11 @@
     </div>
     
     <div class="form-content">
+      <div id="installPrompt" class="install-prompt">
+        <span>📱 Install this app for easier access!</span>
+        <button id="installBtn" class="install-btn">Install</button>
+      </div>
+      
       <div id="message" class="message"></div>
       
       <form id="enrollmentForm">
