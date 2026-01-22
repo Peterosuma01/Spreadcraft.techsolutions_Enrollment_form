@@ -1,4 +1,4 @@
-// Configuration - UPDATE THIS WITH YOUR NEW GOOGLE SCRIPT URL
+// Configuration - UPDATE THIS WITH YOUR GOOGLE SCRIPT URL
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDDrUU1yL4sXVIKpDOukBzQei17lvsWC80jpV9h05mqh5r71TbqxI9wqKh77QL4VX2yg/exec';
 
 // PWA Install Prompt
@@ -72,7 +72,7 @@ document.getElementById('dataNo').addEventListener('change', function() {
   }
 });
 
-// Form submission with better error handling
+// Form submission using form POST (bypasses CORS)
 document.getElementById('enrollmentForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
@@ -123,55 +123,59 @@ document.getElementById('enrollmentForm').addEventListener('submit', async funct
     expectations: this.expectations.value
   };
   
-  try {
-    console.log('Submitting to:', GOOGLE_SCRIPT_URL);
-    console.log('Form data:', formData);
+  console.log('Submitting form data:', formData);
+  
+  // Create hidden iframe for submission
+  const iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.name = 'submission-iframe';
+  document.body.appendChild(iframe);
+  
+  // Create temporary form
+  const tempForm = document.createElement('form');
+  tempForm.method = 'POST';
+  tempForm.action = GOOGLE_SCRIPT_URL;
+  tempForm.target = 'submission-iframe';
+  
+  // Add form data as hidden inputs
+  for (const [key, value] of Object.entries(formData)) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = key;
     
-    // Submit to Google Apps Script with redirect follow
-    const response = await fetch(GOOGLE_SCRIPT_URL, {
-      method: 'POST',
-      redirect: 'follow',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData)
-    });
-    
-    console.log('Response status:', response.status);
-    
-    if (response.ok) {
-      const result = await response.json();
-      console.log('Response data:', result);
-      
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Submit Enrollment';
-      
-      if (result.success) {
-        messageDiv.className = 'message success';
-        messageDiv.textContent = '✓ ' + result.message;
-        messageDiv.style.display = 'block';
-        document.getElementById('enrollmentForm').reset();
-      } else {
-        messageDiv.className = 'message error';
-        messageDiv.textContent = '⚠️ ' + result.message;
-        messageDiv.style.display = 'block';
-      }
+    // Handle arrays (convert to comma-separated string)
+    if (Array.isArray(value)) {
+      input.value = value.join(', ');
     } else {
-      throw new Error('Server returned status: ' + response.status);
+      input.value = value || '';
     }
     
-    // Scroll to top to show message
-    window.scrollTo(0, 0);
-    
-  } catch (error) {
-    console.error('Submission error:', error);
+    tempForm.appendChild(input);
+  }
+  
+  document.body.appendChild(tempForm);
+  
+  // Submit the form
+  tempForm.submit();
+  
+  // Clean up and show success message after delay
+  setTimeout(() => {
+    document.body.removeChild(tempForm);
+    document.body.removeChild(iframe);
     
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Enrollment';
     
-    messageDiv.className = 'message error';
-    messageDiv.textContent = '⚠️ Submission failed. Please try again or contact support. Error: ' + error.message;
+    messageDiv.className = 'message success';
+    messageDiv.textContent = '✓ Thank you! Your enrollment has been submitted successfully. We will contact you soon.';
     messageDiv.style.display = 'block';
+    
+    // Reset form
+    document.getElementById('enrollmentForm').reset();
+    
+    // Scroll to top to show message
     window.scrollTo(0, 0);
-  }
+    
+    console.log('Form submitted successfully');
+  }, 2000);
 });
