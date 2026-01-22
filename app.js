@@ -1,5 +1,5 @@
-// Configuration
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjTpucb16r_I-SIX7jLzSFBGP1RQ9VroWh0pKNFCQJggHmS4yg2cqZX0QK9pdqsqAsEg/exec';
+// Configuration - UPDATE THIS WITH YOUR NEW GOOGLE SCRIPT URL
+const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDDrUU1yL4sXVIKpDOukBzQei17lvsWC80jpV9h05mqh5r71TbqxI9wqKh77QL4VX2yg/exec';
 
 // PWA Install Prompt
 let deferredPrompt;
@@ -72,7 +72,7 @@ document.getElementById('dataNo').addEventListener('change', function() {
   }
 });
 
-// Form submission
+// Form submission with better error handling
 document.getElementById('enrollmentForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
@@ -82,7 +82,7 @@ document.getElementById('enrollmentForm').addEventListener('submit', async funct
   // Check online status
   if (!navigator.onLine) {
     messageDiv.className = 'message error';
-    messageDiv.textContent = 'You are offline. Please check your internet connection and try again.';
+    messageDiv.textContent = '⚠️ You are offline. Please check your internet connection and try again.';
     messageDiv.style.display = 'block';
     window.scrollTo(0, 0);
     return;
@@ -124,37 +124,54 @@ document.getElementById('enrollmentForm').addEventListener('submit', async funct
   };
   
   try {
-    // Submit to Google Apps Script
+    console.log('Submitting to:', GOOGLE_SCRIPT_URL);
+    console.log('Form data:', formData);
+    
+    // Submit to Google Apps Script with redirect follow
     const response = await fetch(GOOGLE_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors', // Google Apps Script requires no-cors
+      redirect: 'follow',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(formData)
     });
     
-    // Note: With no-cors, we can't read the response
-    // So we assume success if no error was thrown
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Submit Enrollment';
+    console.log('Response status:', response.status);
     
-    messageDiv.className = 'message success';
-    messageDiv.textContent = '✓ Enrollment submitted successfully! We will contact you soon.';
-    messageDiv.style.display = 'block';
-    document.getElementById('enrollmentForm').reset();
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Response data:', result);
+      
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Enrollment';
+      
+      if (result.success) {
+        messageDiv.className = 'message success';
+        messageDiv.textContent = '✓ ' + result.message;
+        messageDiv.style.display = 'block';
+        document.getElementById('enrollmentForm').reset();
+      } else {
+        messageDiv.className = 'message error';
+        messageDiv.textContent = '⚠️ ' + result.message;
+        messageDiv.style.display = 'block';
+      }
+    } else {
+      throw new Error('Server returned status: ' + response.status);
+    }
     
-    // Scroll to top to show success message
+    // Scroll to top to show message
     window.scrollTo(0, 0);
     
   } catch (error) {
+    console.error('Submission error:', error);
+    
     submitBtn.disabled = false;
     submitBtn.textContent = 'Submit Enrollment';
     
     messageDiv.className = 'message error';
-    messageDiv.textContent = 'An error occurred. Please try again or contact us directly.';
+    messageDiv.textContent = '⚠️ Submission failed. Please try again or contact support. Error: ' + error.message;
     messageDiv.style.display = 'block';
-    
-    console.error('Submission error:', error);
+    window.scrollTo(0, 0);
   }
 });
