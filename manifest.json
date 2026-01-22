@@ -1,21 +1,21 @@
 {
-  "name": "SpreadCraft Tech Solutions - Course Enrollment",
+  "name": "SpreadCraft Tech Solutions",
   "short_name": "SpreadCraft",
-  "description": "Advanced Microsoft Excel with Applications to Data Analytics - Course Enrollment Form",
+  "description": "Advanced Excel for Data Analytics Course Enrollment",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#667eea",
-  "theme_color": "#1e3c72",
+  "theme_color": "#667eea",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icons/icon-192x192.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
