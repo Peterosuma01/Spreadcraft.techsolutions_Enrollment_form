@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spreadcraft-enrollment-v1';
+const CACHE_NAME = 'spreadcraft-enrollment-v2';
 const urlsToCache = [
   '/',
   '/index.html',
