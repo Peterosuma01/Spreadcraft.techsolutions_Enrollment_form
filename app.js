@@ -1,65 +1,37 @@
-// Configuration - UPDATE THIS WITH YOUR GOOGLE SCRIPT URL
-const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyDDrUU1yL4sXVIKpDOukBzQei17lvsWC80jpV9h05mqh5r71TbqxI9wqKh77QL4VX2yg/exec';
-
-// PWA Install Prompt
-let deferredPrompt;
-const installBanner = document.getElementById('installBanner');
-const installBtn = document.getElementById('installBtn');
-const closeBanner = document.getElementById('closeBanner');
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBanner.style.display = 'flex';
-});
-
-installBtn.addEventListener('click', async () => {
-  if (!deferredPrompt) return;
-  
-  deferredPrompt.prompt();
-  const { outcome } = await deferredPrompt.userChoice;
-  
-  if (outcome === 'accepted') {
-    console.log('PWA installed');
-  }
-  
-  deferredPrompt = null;
-  installBanner.style.display = 'none';
-});
-
-closeBanner.addEventListener('click', () => {
-  installBanner.style.display = 'none';
-});
+// Configuration - UPDATE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
+const CONFIG = {
+  GOOGLE_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyuzzCXXhGuRQEZA4Sx9jbUiTkEEtP3ZCrfWjue48De50g3wsFtNuQ44oIApV9I0EcI0A/exec'
+};
 
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(registration => {
-        console.log('ServiceWorker registered:', registration.scope);
-      })
-      .catch(err => {
-        console.log('ServiceWorker registration failed:', err);
-      });
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('Service Worker registered'))
+      .catch(err => console.log('Service Worker registration failed:', err));
   });
 }
 
-// Online/Offline Detection
-const offlineIndicator = document.getElementById('offlineIndicator');
+// PWA Install Prompt
+let deferredPrompt;
 
-window.addEventListener('online', () => {
-  offlineIndicator.style.display = 'none';
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installPrompt').style.display = 'flex';
 });
 
-window.addEventListener('offline', () => {
-  offlineIndicator.style.display = 'block';
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`User response: ${outcome}`);
+    deferredPrompt = null;
+    document.getElementById('installPrompt').style.display = 'none';
+  }
 });
 
-if (!navigator.onLine) {
-  offlineIndicator.style.display = 'block';
-}
-
-// Show/hide data type section based on "worked with data" answer
+// Conditional section visibility
 document.getElementById('dataYes').addEventListener('change', function() {
   if (this.checked) {
     document.getElementById('dataTypeSection').style.display = 'block';
@@ -72,21 +44,12 @@ document.getElementById('dataNo').addEventListener('change', function() {
   }
 });
 
-// Form submission using form POST (bypasses CORS)
+// Form submission
 document.getElementById('enrollmentForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   
   const submitBtn = document.getElementById('submitBtn');
   const messageDiv = document.getElementById('message');
-  
-  // Check online status
-  if (!navigator.onLine) {
-    messageDiv.className = 'message error';
-    messageDiv.textContent = '⚠️ You are offline. Please check your internet connection and try again.';
-    messageDiv.style.display = 'block';
-    window.scrollTo(0, 0);
-    return;
-  }
   
   submitBtn.disabled = true;
   submitBtn.textContent = 'Submitting...';
@@ -123,59 +86,91 @@ document.getElementById('enrollmentForm').addEventListener('submit', async funct
     expectations: this.expectations.value
   };
   
-  console.log('Submitting form data:', formData);
-  
-  // Create hidden iframe for submission
-  const iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.name = 'submission-iframe';
-  document.body.appendChild(iframe);
-  
-  // Create temporary form
-  const tempForm = document.createElement('form');
-  tempForm.method = 'POST';
-  tempForm.action = GOOGLE_SCRIPT_URL;
-  tempForm.target = 'submission-iframe';
-  
-  // Add form data as hidden inputs
-  for (const [key, value] of Object.entries(formData)) {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = key;
-    
-    // Handle arrays (convert to comma-separated string)
-    if (Array.isArray(value)) {
-      input.value = value.join(', ');
-    } else {
-      input.value = value || '';
+  try {
+    // Check if we're online
+    if (!navigator.onLine) {
+      // Store data locally if offline
+      saveToLocalStorage(formData);
+      showMessage('You are offline. Your enrollment has been saved and will be submitted when you reconnect.', 'success');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Submit Enrollment';
+      return;
     }
     
-    tempForm.appendChild(input);
-  }
-  
-  document.body.appendChild(tempForm);
-  
-  // Submit the form
-  tempForm.submit();
-  
-  // Clean up and show success message after delay
-  setTimeout(() => {
-    document.body.removeChild(tempForm);
-    document.body.removeChild(iframe);
+    // Submit to Google Apps Script
+    const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
     
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Submit Enrollment';
-    
-    messageDiv.className = 'message success';
-    messageDiv.textContent = '✓ Thank you! Your enrollment has been submitted successfully. We will contact you soon.';
-    messageDiv.style.display = 'block';
-    
-    // Reset form
-    document.getElementById('enrollmentForm').reset();
-    
-    // Scroll to top to show message
+    // Note: no-cors mode doesn't allow reading response
+    // So we assume success if no error is thrown
+    showMessage('Enrollment submitted successfully! We will contact you soon.', 'success');
+    this.reset();
     window.scrollTo(0, 0);
     
-    console.log('Form submitted successfully');
-  }, 2000);
+    // Clear any stored offline data
+    localStorage.removeItem('pendingEnrollment');
+    
+  } catch (error) {
+    console.error('Error:', error);
+    saveToLocalStorage(formData);
+    showMessage('There was an issue submitting your enrollment. Your data has been saved and will be submitted when connection is restored.', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Submit Enrollment';
+  }
+});
+
+// Helper function to show messages
+function showMessage(text, type) {
+  const messageDiv = document.getElementById('message');
+  messageDiv.textContent = text;
+  messageDiv.className = `message ${type}`;
+  messageDiv.style.display = 'block';
+  
+  setTimeout(() => {
+    messageDiv.style.display = 'none';
+  }, 10000);
+}
+
+// Save to localStorage for offline support
+function saveToLocalStorage(data) {
+  const enrollments = JSON.parse(localStorage.getItem('pendingEnrollments') || '[]');
+  enrollments.push({
+    ...data,
+    timestamp: new Date().toISOString()
+  });
+  localStorage.setItem('pendingEnrollments', JSON.stringify(enrollments));
+}
+
+// Check for pending enrollments when online
+window.addEventListener('online', async () => {
+  const pendingEnrollments = JSON.parse(localStorage.getItem('pendingEnrollments') || '[]');
+  
+  if (pendingEnrollments.length > 0) {
+    showMessage('Connection restored. Submitting pending enrollments...', 'success');
+    
+    for (const enrollment of pendingEnrollments) {
+      try {
+        await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(enrollment)
+        });
+      } catch (error) {
+        console.error('Failed to submit pending enrollment:', error);
+      }
+    }
+    
+    localStorage.removeItem('pendingEnrollments');
+    showMessage('All pending enrollments have been submitted!', 'success');
+  }
 });
